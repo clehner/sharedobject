@@ -7,9 +7,24 @@ SharedObject.prototype = {
 	_state: null,
 	_catchalls: null, // handlers that fire for every key
 	_handlers: null, // handlers that fire for particular keys
+	
+	/**
+	 * Get the current value of a key.
+	 * @param {string} key The key to get the value of.
+	 * @return {*} The value of the key.
+	 */
 	get: function get(key) {
 		return this._state[key];
 	},
+
+	/**
+	 * Set the value of a key, and fire relevant listeners. If a context
+	 * is specified, than listeners with that context will not be fired.
+	 * @param {string} key The key to set the value of.
+	 * @param {*} value The value to set.
+	 * @param {object=} context The object that is setting the value.
+	 * @return {*} The value of the key.
+	 */
 	set: function set(key, value, context) {
 		if (typeof arguments[0] == "object") {
 			// can set values with a key-value object
@@ -50,7 +65,8 @@ SharedObject.prototype = {
 			obj = obj.__proto__ ||
 				(Object.getPrototypeOf ? Object.getPrototypeOf(obj) :
 				obj.constructor.prototype);
-		} while (obj instanceof SharedObject && obj != this);
+		} while ((obj instanceof SharedObject ||
+			obj == SharedObject.prototype) && obj != this);
 		return this;
 	},
 	/*
@@ -128,6 +144,12 @@ SharedObject.prototype = {
 		return this;
 	},
 	
+	/**
+	 * Bind a function to a key but unbind it after it fires once.
+	 * @param {string} key The key to bind the handler to.
+	 * @param {function(string, string)} handler The handler function.
+	 * @param {object=} context Context object for the function.
+	 */
 	bindOnce: function bindOnce(key, handler, context) {
 		var value = this._state[key];
 		if (value == null) {
@@ -138,6 +160,7 @@ SharedObject.prototype = {
 		} else {
 			handler.call(context, value);
 		}
+		return this;
 	}
 }
 window["SharedObject"] = SharedObject;

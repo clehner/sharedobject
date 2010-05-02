@@ -4,27 +4,27 @@ var wavy = new SharedObject();
 
 var bufferLevel = 0;
 
-wavy.bufferStart = function () {
+wavy.startBuffer = function () {
 	if (0 == bufferLevel++) {
 		wavy.set("buffering", true, wavy);
 	}
 };
 
-wavy.bufferEnd = function () {
+wavy.endBuffer = function () {
 	if (--bufferLevel == 0) {
 		wavy.set("buffering", false, wavy);
 	}
 };
 
-wavy.bufferFn = function (fn, context) {
-	var newBuffer = !bufferLevel && wavy.bufferStart();
+wavy.buffer = function (fn, context) {
+	var newBuffer = !bufferLevel && wavy.startBuffer();
 	fn.call(context);
-	newBuffer && wavy.bufferEnd();
+	newBuffer && wavy.endBuffer();
 };
 
 wavy.flushBuffer = function () {
-	wavy.bufferEnd();
-	wavy.bufferStart();
+	wavy.endBuffer();
+	wavy.startBuffer();
 };
 
 wavy.bind("buffering", function (buffering) {
@@ -131,6 +131,7 @@ ParticipantsSharedObject.prototype = new SharedObject();
 // Set up Wave callbacks
 window.gadgets && gadgets.util.registerOnLoadHandler(function onLoad() {
 	if (window.wave && wave.isInWaveContainer()) {
+		wavy.set("wave_id", wave.getWaveId());
 		wave.setParticipantCallback(function () {
 			var parts = new ParticipantsSharedObject();
 			wave.setParticipantCallback(function () {
