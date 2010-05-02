@@ -85,8 +85,8 @@ Properties
 Participant objects
 ------------
 
-SharedObjects are used to represent wave participants. 
-The value of keys "host" and "viewer", and all the values of the participants
+Wave participants are represented by SharedObjects.
+The value of wavy keys "host" and "viewer", and all the values of the participants
 object, are participant objects. They have the following properties:
 
 - id: the participant's wave address
