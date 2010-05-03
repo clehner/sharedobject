@@ -134,13 +134,15 @@ window.gadgets && gadgets.util.registerOnLoadHandler(function onLoad() {
 		wavy.set("wave_id", wave.getWaveId());
 		wave.setParticipantCallback(function () {
 			var parts = new ParticipantsSharedObject();
-			wave.setParticipantCallback(function () {
+			function participantUpdate() {
 				parts._updateParticipants(wave.participantMap_);
 				var viewer = wave.getViewer();
 				wavy.set("viewer", viewer && parts.get(viewer.getId()));
 				var host = wave.getHost();
 				wavy.set("host", host && parts.get(host.getId()));
-			});
+			}
+			participantUpdate();
+			wave.setParticipantCallback(participantUpdate);
 			wavy.set("participants", parts);
 		});
 		wave.setStateCallback(function (state) {
