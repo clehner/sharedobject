@@ -120,12 +120,4 @@ test("bindOnce fires handler exactly once", 1, function() {
 	obj2.set("key", "value");
 	obj.set("ref", null);
 	ok(obj2.get("key") == null, "unreachable objects are destroyed");
-});
-
-module("Module B");
-
-test("some other test", function () {
-	expect(2);
-	equals(true, false, "failing test");
-	equals(true, true, "passing test");
 });*/
