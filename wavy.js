@@ -133,16 +133,18 @@ window.gadgets && gadgets.util.registerOnLoadHandler(function onLoad() {
 	if (window.wave && wave.isInWaveContainer()) {
 		wavy.set("wave_id", wave.getWaveId());
 		wave.setParticipantCallback(function () {
+			if (!wave.getViewer()) {
+				// sometimes, the first participant update is fake.
+				return;
+			}
 			var parts = new ParticipantsSharedObject();
-			function participantUpdate() {
+			wave.setParticipantCallback(function () {
 				parts._updateParticipants(wave.participantMap_);
 				var viewer = wave.getViewer();
 				wavy.set("viewer", viewer && parts.get(viewer.getId()));
 				var host = wave.getHost();
 				wavy.set("host", host && parts.get(host.getId()));
-			}
-			participantUpdate();
-			wave.setParticipantCallback(participantUpdate);
+			});
 			wavy.set("participants", parts);
 		});
 		wave.setStateCallback(function (state) {
