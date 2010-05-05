@@ -106,7 +106,7 @@ SharedObject.prototype = {
 		return this;
 	},
 	
-	unbind: function (a, b, c) {
+	unbind: function unbind(a, b, c) {
 		var key, handler, handlers, context, listeners;
 		switch(typeof a) {
 		case "function":
