@@ -121,3 +121,11 @@ test("bindOnce fires handler exactly once", 1, function() {
 	obj.set("ref", null);
 	ok(obj2.get("key") == null, "unreachable objects are destroyed");
 });*/
+
+/* todo: add tests for:
+valueof
+getobject
+out
+set(sharedobject)
+bindobj
+*/
