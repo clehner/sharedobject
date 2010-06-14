@@ -134,7 +134,7 @@ window.gadgets && gadgets.util.registerOnLoadHandler(function onLoad() {
 		wavy.set("wave_id", wave.getWaveId());
 		wave.setParticipantCallback(function () {
 			if (!wave.getViewer()) {
-				// sometimes, the first participant update is fake.
+				// sometimes the first participant update is fake.
 				return;
 			}
 			var parts = new ParticipantsSharedObject();

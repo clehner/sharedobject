@@ -1,6 +1,8 @@
 /** @constructor */
 function SharedObject() {
 	this._state = {};
+	this._handlers = {};
+	this._catchalls = [];
 }
 SharedObject.prototype = {
 	constructor: SharedObject,
@@ -8,15 +10,41 @@ SharedObject.prototype = {
 	_catchalls: null, // handlers that fire for every key
 	_handlers: null, // handlers that fire for particular keys
 	
+	valueOf: function valueOf() {
+		return this._state;
+	},
+
 	/**
 	 * Get the current value of a key.
-	 * @param {string} key The key to get the value of.
+	 * @param {string=} key The key to get the value of.
 	 * @return {*} The value of the key.
 	 */
 	get: function get(key) {
 		return this._state[key];
 	},
 
+	getObject: function getObject(key) {
+		var obj = this.get(key);
+		if (!(obj instanceof SharedObject)) {
+			obj = new SharedObject()
+			this.set(key, obj);
+		}
+		return obj;
+	},
+	
+	out2: function (key, value) {
+		this._flat[key] = (value instanceof SharedObject) ?
+			value.out() : value;
+	},
+	
+	out: function out() {
+		if (!this._flat) {
+			this._flat = {};
+			this.bind(this.out2, this);
+		}
+		return this._flat;
+	},
+	
 	/**
 	 * Set the value of a key, and fire relevant listeners. If a context
 	 * is specified, than listeners with that context will not be fired.
@@ -30,6 +58,9 @@ SharedObject.prototype = {
 			// can set values with a key-value object
 			var values = arguments[0];
 			var context2 = arguments[1];
+			if (values instanceof SharedObject) {
+				values = values.valueOf();
+			}
 			for (var key2 in values) {
 				set.call(this, key2, values[key2], context2);
 			}
@@ -106,12 +137,12 @@ SharedObject.prototype = {
 		return this;
 	},
 	
-	unbind: function unbind(a, b, c) {
-		var key, handler, handlers, context, listeners;
+	unbind: function unbind(arg1, arg2, arg3) {
 		switch(typeof a) {
 		case "function":
-			(handler = a, context = b)
-			handlers = this._catchalls;
+			var handler = arg1;
+			var context = arg2;
+			var handlers = this._catchalls;
 			if (handlers) {
 				for (var i = 0; i < handlers.length; i++) {
 					var someHandler = handlers[i];
@@ -123,13 +154,16 @@ SharedObject.prototype = {
 			}
 		break;
 		case "object":
-			(handlers = a, context = b)
-			for (key in handlers) {
-				bind.call(this, key, handlers[key], context);
+			var handlers = arg1;
+			var context = arg2;
+			for (var key in handlers) {
+				unbind.call(this, key, handlers[key], context);
 			}
 		break;
 		default:
-			(key = a, handler = b, context = c)
+			var key = arg1;
+			var handler = arg2;
+			var context = arg3;
 			var keys = this._handlers;
 			if (keys && (handlers = keys[key])) {
 				for (var i = 0; i < handlers.length; i++) {
@@ -160,6 +194,13 @@ SharedObject.prototype = {
 		} else {
 			handler.call(context, value);
 		}
+		return this;
+	},
+	
+	bindObj: function bindObj(key1, obj2, key2) {
+		var obj1 = this;
+		obj1.bind(key1, function (val) { obj2.set(key2, val, obj1); }, obj2);
+		obj2.bind(key2, function (val) { obj1.set(key1, val, obj2); }, obj1);
 		return this;
 	}
 }
