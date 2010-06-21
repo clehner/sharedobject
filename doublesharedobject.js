@@ -206,6 +206,7 @@ function DoubleDelimitedSharedObject(source, keyDelimiter) {
 			destroyObject(prevValue);
 		}
 		if (value instanceof SharedObject) {
+			value._keyPrefix = this._keyPrefix + key + keyDelimiter;
 			manageObject(value);
 		} else {
 			source.set(this._keyPrefix + key, value, self);

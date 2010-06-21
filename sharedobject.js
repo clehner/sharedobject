@@ -138,7 +138,7 @@ SharedObject.prototype = {
 	},
 	
 	unbind: function unbind(arg1, arg2, arg3) {
-		switch(typeof a) {
+		switch(typeof arg1) {
 		case "function":
 			var handler = arg1;
 			var context = arg2;
